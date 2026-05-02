@@ -24,7 +24,7 @@ public class StudentController {
     public String listStudents(@RequestParam(value = "search", required = false) String search, Model model) {
         try {
             if (search != null && !search.trim().isEmpty()) {
-                model.addAttribute("students", studentService.searchByName(search));
+                model.addAttribute("students", studentService.searchByNameWithDetails(search));
                 model.addAttribute("pageTitle", "Search Results for '" + search + "'");
             } else {
                 model.addAttribute("students", studentService.getAllWithCourseDetails());

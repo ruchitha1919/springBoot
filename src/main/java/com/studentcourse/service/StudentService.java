@@ -21,8 +21,8 @@ public class StudentService {
         return studentRepository.fetchStudentsWithCourseInfo();
     }
 
-    public List<Student> searchByName(String name) {
-        return studentRepository.findByNameContainingIgnoreCase(name);
+    public List<StudentWithCourseDTO> searchByNameWithDetails(String name) {
+        return studentRepository.searchStudentsWithCourseInfo(name);
     }
 
     public Student getById(Long id) {

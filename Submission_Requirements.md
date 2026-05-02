@@ -47,7 +47,7 @@ studentRepository.save(new Student("Alice Johnson", "alice@test.com", c1));
 ### 3.2 Create — Accepting and Persisting Records
 Forms (`form.jsp` and `course-form.jsp`) collect user data. The controller uses `@RequestParam` to map field values and handles persistence through the Service layer.
 
-![Student Form](file:///C:/Users/Ruchitha%20A/.gemini/antigravity/brain/975d2305-0b38-4d01-a684-e277c088f489/student_form_1777743679727.png)
+![Student Form](screenshots/student_form_final.png)
 
 ### 3.3 Read — N+1 Query Optimization
 To avoid the **N+1 query problem** (where Hibernate fires a separate query for each student's course), a custom JPQL query joins both tables and projects the result into a `StudentWithCourseDTO`. This reduces database traffic to a **single round-trip**.
@@ -57,7 +57,7 @@ To avoid the **N+1 query problem** (where Hibernate fires a separate query for e
        "FROM Student s INNER JOIN s.course c")
 List<StudentWithCourseDTO> fetchStudentsWithCourseInfo();
 ```
-![Student List](file:///C:/Users/Ruchitha%20A/.gemini/antigravity/brain/975d2305-0b38-4d01-a684-e277c088f489/student_list_1777743663905.png)
+![Student List](screenshots/student_list_final.png)
 
 ---
 

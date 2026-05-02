@@ -94,7 +94,7 @@
                                 <td>${status.count}</td>
                                 <td><strong>${student.name}</strong></td>
                                 <td>${student.email}</td>
-                                <td>${student.course != null ? student.course.name : student.courseName}</td>
+                                <td>${student.courseName}</td>
                                 <td>
                                     <a href="/edit/${student.id}" class="btn-edit">✎ Edit</a>
                                     <a href="/delete/${student.id}" class="btn-delete" onclick="return confirm('Are you sure?');">🗑 Delete</a>
