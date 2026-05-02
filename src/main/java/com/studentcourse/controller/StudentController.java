@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.util.List;
 
 @Controller
 public class StudentController {
@@ -24,15 +23,13 @@ public class StudentController {
     @GetMapping("/")
     public String listStudents(@RequestParam(value = "search", required = false) String search, Model model) {
         try {
-            List<Student> students;
             if (search != null && !search.trim().isEmpty()) {
-                students = studentService.searchByName(search);
+                model.addAttribute("students", studentService.searchByName(search));
                 model.addAttribute("pageTitle", "Search Results for '" + search + "'");
             } else {
-                students = studentService.getAll();
+                model.addAttribute("students", studentService.getAllWithCourseDetails());
                 model.addAttribute("pageTitle", "All Students");
             }
-            model.addAttribute("students", students);
             model.addAttribute("searchKeyword", search);
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Could not load students: " + e.getMessage());
@@ -43,14 +40,13 @@ public class StudentController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         try {
-            List<Course> courses = courseService.getAll();
             model.addAttribute("student", new Student());
-            model.addAttribute("courses", courses);
+            model.addAttribute("courses", courseService.getAll());
             model.addAttribute("pageTitle", "Add New Student");
             model.addAttribute("formAction", "/save");
             model.addAttribute("buttonLabel", "Add Student");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Could not load form: " + e.getMessage());
+            model.addAttribute("errorMessage", "Could not load form");
         }
         return "form";
     }
@@ -59,16 +55,15 @@ public class StudentController {
     public String saveStudent(@RequestParam("name") String name,
                              @RequestParam("email") String email,
                              @RequestParam("courseId") Long courseId,
-                             RedirectAttributes redirectAttributes) {
+                             RedirectAttributes ra) {
         try {
             Course course = courseService.getById(courseId);
-            Student student = new Student(name, email, course);
-            studentService.save(student);
-            redirectAttributes.addFlashAttribute("successMessage", "Student '" + name + "' added successfully!");
+            studentService.save(new Student(name, email, course));
+            ra.addFlashAttribute("successMessage", "Student saved successfully!");
         } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Integrity violation: Duplicate email or invalid data.");
+            ra.addFlashAttribute("errorMessage", "Integrity violation: Duplicate email.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error saving student: " + e.getMessage());
+            ra.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
         }
         return "redirect:/";
     }
@@ -76,18 +71,15 @@ public class StudentController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         try {
-            Student student = studentService.getById(id);
-            List<Course> courses = courseService.getAll();
-            model.addAttribute("student", student);
-            model.addAttribute("courses", courses);
+            model.addAttribute("student", studentService.getById(id));
+            model.addAttribute("courses", courseService.getAll());
             model.addAttribute("pageTitle", "Edit Student");
             model.addAttribute("formAction", "/update/" + id);
             model.addAttribute("buttonLabel", "Update Student");
+            return "form";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Student not found: " + e.getMessage());
-            return "list";
+            return "redirect:/";
         }
-        return "form";
     }
 
     @PostMapping("/update/{id}")
@@ -95,25 +87,24 @@ public class StudentController {
                                @RequestParam("name") String name,
                                @RequestParam("email") String email,
                                @RequestParam("courseId") Long courseId,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes ra) {
         try {
             Course course = courseService.getById(courseId);
-            Student updatedStudent = new Student(name, email, course);
-            studentService.update(id, updatedStudent);
-            redirectAttributes.addFlashAttribute("successMessage", "Student updated successfully!");
+            studentService.update(id, new Student(name, email, course));
+            ra.addFlashAttribute("successMessage", "Student updated!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error updating student: " + e.getMessage());
+            ra.addFlashAttribute("errorMessage", "Update failed.");
         }
         return "redirect:/";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteStudent(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteStudent(@PathVariable Long id, RedirectAttributes ra) {
         try {
             studentService.delete(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Student deleted successfully!");
+            ra.addFlashAttribute("successMessage", "Student deleted.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error deleting student: " + e.getMessage());
+            ra.addFlashAttribute("errorMessage", "Delete failed.");
         }
         return "redirect:/";
     }

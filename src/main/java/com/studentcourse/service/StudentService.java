@@ -1,6 +1,7 @@
 package com.studentcourse.service;
 
 import com.studentcourse.entity.Student;
+import com.studentcourse.entity.StudentWithCourseDTO;
 import com.studentcourse.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,10 @@ public class StudentService {
 
     public List<Student> getAll() {
         return studentRepository.findAll();
+    }
+
+    public List<StudentWithCourseDTO> getAllWithCourseDetails() {
+        return studentRepository.fetchStudentsWithCourseInfo();
     }
 
     public List<Student> searchByName(String name) {
